@@ -7,29 +7,27 @@ def calcular_retornos_e_lucros(stakes, odds, stake_total):
     lucros = {mercado: retorno - stake_total for mercado, retorno in retornos.items()}
     return retornos, lucros
 
-def ajustar_stakes(stakes, stake_total):
-    """Ajusta stakes proporcionalmente ao total permitido."""
-    ajuste = stake_total / sum(stakes.values())
-    return {mercado: stake * ajuste for mercado, stake in stakes.items()}
-
 def calcular_stakes(stake_total, lucro_desejado, odds):
-    """Calcula as stakes, retornos e lucros para os mercados."""
-    # Cálculo inicial das stakes
-    stakes = {mercado: (stake_total + lucro_desejado) / odds[mercado] for mercado in odds}
-    stakes = ajustar_stakes(stakes, stake_total)  # Ajusta stakes para caber no total
+    """Calcula as stakes para garantir lucro positivo em todos os mercados."""
+    stakes = {}
 
-    # Cálculo de retornos e lucros
+    # Calcular stake mínima necessária para garantir lucro em cada mercado
+    for mercado, odd in odds.items():
+        stakes[mercado] = (stake_total + lucro_desejado) / odd
+
+    # Ajustar stakes proporcionalmente ao total disponível
+    total_stakes = sum(stakes.values())
+    if total_stakes > stake_total:
+        ajuste = stake_total / total_stakes
+        stakes = {mercado: stake * ajuste for mercado, stake in stakes.items()}
+
+    # Calcular retornos e lucros
     retornos, lucros = calcular_retornos_e_lucros(stakes, odds, stake_total)
 
-    # Ajustar stakes até que todos os mercados atinjam o lucro desejado
-    iteracoes = 0  # Evitar loops infinitos
-    while min(lucros.values()) < lucro_desejado and iteracoes < 1000:
-        stakes = {mercado: stake * 1.01 for mercado, stake in stakes.items()}  # Incremento pequeno
-        stakes = ajustar_stakes(stakes, stake_total)  # Reajustar stakes
-        retornos, lucros = calcular_retornos_e_lucros(stakes, odds, stake_total)
-        iteracoes += 1
-
-    # Resultado final
+    # Verificar se o lucro é positivo em todos os mercados
+    if min(lucros.values()) < lucro_desejado:
+        st.warning("Não foi possível garantir lucro positivo para todos os mercados com as odds e stakes fornecidas.")
+    
     return {"stakes": stakes, "retornos": retornos, "lucros": lucros}
 
 # Interface do Streamlit
