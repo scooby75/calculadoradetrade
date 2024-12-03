@@ -53,7 +53,7 @@ def calcular_stakes(stake_total, lucro_desejado, odd_0x0, odd_25ht, odd_05ht, od
     return resultado
 
 # Interface do Streamlit
-st.title("Calculadora de Stakes para Mercados de Apostas")
+st.title("Dutching HT")
 
 # Entradas do usuário
 stake_total = st.number_input("Stake Total", min_value=0.0, value=10.0, step=0.1)
