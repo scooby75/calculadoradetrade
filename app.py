@@ -3,7 +3,7 @@ import streamlit as st
 # Funções auxiliares
 def calcular_retornos_e_lucros(stakes, odds, stake_total):
     """Calcula retornos e lucros para cada mercado."""
-    retornos = {mercado: stake * odd for mercado, (stake, odd) in zip(stakes.keys(), odds.items())}
+    retornos = {mercado: stake * odds[mercado] for mercado, stake in stakes.items()}
     lucros = {mercado: retorno - stake_total for mercado, retorno in retornos.items()}
     return retornos, lucros
 
